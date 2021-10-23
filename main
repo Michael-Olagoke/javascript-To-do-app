@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> TO DO APP</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        /* body styling */
+        body{background: burlywood; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;}
+        /* div container styling */
+        div#container{max-width:750px; min-width:350px; margin:40px auto 5px; padding:auto 10px;}
+
+        /* h2 styling */
+        h2{text-align:center;}
+        /* input field styling */
+        input{
+            width:75%;
+            padding: 10px;
+            float:left;
+            border-radius: 8px;
+        }
+        /* styling for input:focus */
+        input:focus{
+            border:1px solid gray;
+        }
+        /*Add Button styling */
+        button#add{
+            background: limegreen;
+            width:20%;
+            float:right;
+            font-weight: bolder;
+            border:1px solid grey;
+            font-size:18px;
+            height: 38px;
+            color:white;
+            border-radius: 5px;
+        }
+        /* Button hover styling */
+        button:hover{
+            cursor: pointer;
+        }
+        /* head container styling */
+        div#head:after{
+            content: "";
+            display: table;
+            clear:both;
+        }
+        /* ul styling */
+        ul{
+            margin: 0;
+            padding:0;
+        }
+
+        /* li styling */
+        li{
+           list-style-type: none; 
+           border-left:6px solid limegreen;
+           border-bottom:1px solid burlywood;
+           font-size:19px;
+           padding:10px;
+           margin-top:10px;
+           background: #eee;
+           position: relative;
+        }
+        
+        /* edit button styling */
+        .edit{ 
+              background:powderblue;
+              color:black;
+            }
+
+        /* edit and delete button styling */
+        .edit, .delete{
+            font-size: 18px;
+            padding:2px 12px;
+        }
+        /* span container styling */
+        span{
+            position:absolute;
+            right: 5px;
+            top: 7px;
+            font-weight:bolder;
+        }
+        /* delete button styling */
+        .delete{
+            background: red;
+            color:whitesmoke;
+            border:1px solid gray;
+        }
+        /* actively selected task styling */
+        .active{
+            background: cadetblue;
+        }
+        /* disabled button(s) styling */
+        button:disabled{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2>TO DO LIST</h2>
+        <div id="head">
+            <input type="text"> <button id="add" onclick="addNewTask()"> Add</button>            
+        </div>
+        <ul id="lists">
+            <li> Shop for groceries 
+                <span> 
+                    <button class="edit" onclick="Edit(this)"> &#128394; </button>
+                    <button class="delete" onclick="deleteTask(this)"> &times;</button> 
+                </span>
+            </li>
+            <li> Fix the lawnmower 
+                <span> 
+                    <button class="edit" onclick="Edit(this)"> &#x1F58A; </button> 
+                    <button class="delete" onclick="deleteTask(this)"> &times; </button> 
+                </span>
+            </li>
+            <li> Clean the garden 
+                <span> 
+                    <button class="edit" onclick="Edit(this)"> &#x1F58A; </button> 
+                    <button class="delete" onclick="deleteTask(this)"> &times; </button> 
+                </span>
+            </li>
+            <li> Feed the cats 
+                <span> 
+                    <button class="edit" onclick="Edit(this)"> &#x1F58A; </button> 
+                    <button class="delete" onclick="deleteTask(this)"> &times; </button> 
+                </span>
+            </li>
+            <li> Read a book 
+                <span> 
+                    <button class="edit" onclick="Edit(this)"> &#x1F58A; </button> 
+                    <button class="delete" onclick="deleteTask(this)"> &times; </button> 
+                </span>
+            </li>
+        </ul>
+    </div>
+    <script>
+        const input = document.querySelector('input')
+        const addBtn = document.querySelector('button#add')
+        const ul = document.querySelector('ul')
+
+        // function addNewTask to append new tasks
+        const addNewTask = ()=>{
+            if(input.value !== ''){
+                // add input text to the todo list
+                let newTask = "<li> " + input.value + 
+                    `<span> 
+                        <button class="edit" onclick="Edit(this)"> &#x1F58A; </button>
+                        <button class="delete" onclick="deleteTask(this)"> &times; </button> 
+                    </span>
+                    </li>`
+                input.value = '';
+                return ul.innerHTML += newTask
+            }else{
+                return alert('Input field is empty!')
+            }
+        }
+
+        // function Edit to make corrections to tasks
+        const Edit = e =>{
+            let parent = e.parentElement.parentElement;
+            // set parent class to active
+            parent.setAttribute('class','active')
+            input.value = parent.firstChild.textContent.trim();
+            // disable all other task buttons
+            let allTaskButton = document.querySelectorAll('span button')
+            for(let i = 0; i < allTaskButton.length; i++){
+                allTaskButton[i].setAttribute('disabled','true')
+            }
+
+            // set focus on input field
+            input.focus();
+
+            // change add button functionality and text content
+            addBtn.innerText = "Edit"
+            // remove previous addBtn click event handler
+            addBtn.onclick = '';
+            // function edited intialization and setup
+            const edited = ()=>{
+                parent.firstChild.textContent = input.value;
+
+                // reset addBtn button to initial configuration
+                addBtn.innerText = "Add"
+                addBtn.removeEventListener('click',edited);
+                addBtn.addEventListener('click',addNewTask)
+
+                // remove .active class from parent element
+                parent.removeAttribute('class')
+
+                // enable all disabled buttons
+                for(let i = 0; i < allTaskButton.length; i++){
+                    allTaskButton[i].removeAttribute('disabled')
+                }
+            }
+            // assign a new click event handler
+            addBtn.addEventListener('click',edited)
+        }
+
+        // deleteTask function
+        const deleteTask = ev =>{
+            let parent = ev.parentElement.parentElement;
+            ul.removeChild(parent);
+        }
+    </script>
+</body>
+</html>
